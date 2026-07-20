@@ -8,4 +8,4 @@ tests, fixtures, schemas, public-safe docs, and examples.
 
 Do not add private strategy, customer details, pricing, workspace-local paths,
 Discord metadata, management backlog, or commercial control-plane code here.
-Keep the repo private until Russ explicitly approves public release.
+Keep the repo private until explicit public-release approval.
