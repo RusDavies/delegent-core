@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delegent.example/schemas/validation-result.schema.json",
+  "title": "Delegent Validation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "reason_code", "audit_event"],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["allow", "deny", "require_review", "error_fail_closed"]
+    },
+    "reason_code": { "$ref": "reason-code.schema.json" },
+    "audit_event": { "$ref": "authority-grant-validated-audit-event.schema.json" }
+  }
+}

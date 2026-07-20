@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delegent.example/schemas/validation-request.schema.json",
+  "title": "Delegent Validation Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "method",
+    "url",
+    "audience",
+    "project_id",
+    "session_id",
+    "requested_action",
+    "purpose",
+    "grant",
+    "sender_proof"
+  ],
+  "properties": {
+    "method": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "format": "uri" },
+    "audience": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "session_id": { "type": "string", "minLength": 1 },
+    "requested_action": { "type": "string", "minLength": 1 },
+    "purpose": { "type": "string", "minLength": 1 },
+    "grant": { "$ref": "signed-authority-grant.schema.json" },
+    "sender_proof": { "$ref": "sender-proof.schema.json" },
+    "payload_ref": { "type": ["string", "null"], "minLength": 1 },
+    "raw_payload": {
+      "type": ["string", "null"],
+      "description": "Reference validators should reject non-null raw payloads."
+    }
+  }
+}

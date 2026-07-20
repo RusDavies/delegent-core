@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delegent.example/schemas/reason-code.schema.json",
+  "title": "Delegent Reason Code",
+  "type": "string",
+  "enum": [
+    "missing_field",
+    "malformed_proof",
+    "untrusted_issuer",
+    "wrong_audience",
+    "wrong_project",
+    "wrong_session",
+    "action_not_allowed",
+    "delegation_missing",
+    "delegation_expired",
+    "delegation_revoked_or_denied",
+    "grant_not_yet_valid",
+    "grant_expired",
+    "grant_revoked_or_denied",
+    "sender_constraint_failed",
+    "replay_detected",
+    "policy_denied",
+    "policy_review_required",
+    "attestation_required",
+    "dependency_unavailable",
+    "raw_payload_not_allowed",
+    "internal_error_fail_closed",
+    "allowed"
+  ]
+}

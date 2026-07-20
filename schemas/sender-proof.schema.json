@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delegent.example/schemas/sender-proof.schema.json",
+  "title": "Delegent Sender Proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sender_constraint_id",
+    "method",
+    "url",
+    "replay_handle",
+    "timestamp",
+    "signature"
+  ],
+  "properties": {
+    "sender_constraint_id": { "type": "string", "minLength": 1 },
+    "method": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "format": "uri" },
+    "replay_handle": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "signature": { "type": "string", "minLength": 1 }
+  }
+}

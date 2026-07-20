@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delegent.example/schemas/authority-grant-issued-audit-event.schema.json",
+  "title": "Delegent Authority Grant Issued Audit Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "grant_id",
+    "issuer",
+    "issued_at",
+    "expires_at",
+    "workload_id",
+    "delegation_id",
+    "project_id",
+    "session_id",
+    "allowed_actions",
+    "sender_constraint_id",
+    "result",
+    "reason_code"
+  ],
+  "properties": {
+    "event_type": { "const": "authority_grant_issued" },
+    "grant_id": { "type": "string", "minLength": 1 },
+    "issuer": { "type": "string", "minLength": 1 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "workload_id": { "type": "string", "minLength": 1 },
+    "delegation_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "session_id": { "type": "string", "minLength": 1 },
+    "allowed_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "sender_constraint_id": { "type": "string", "minLength": 1 },
+    "policy_decision_id": { "type": ["string", "null"], "minLength": 1 },
+    "result": { "const": "issued" },
+    "reason_code": { "const": "allowed" }
+  }
+}

@@ -20,6 +20,10 @@ This repository starts private until explicit public-release approval.
   `AuthorityGrantIssuer`, `AuthorityProofValidator`,
   `CapabilityActionProfile`, `InMemoryReplayCache`,
   `StaticRevocationStatusProvider`, and `make_sender_proof`.
+- `schemas/` contains JSON Schema fragments for grants, sender proofs,
+  validation requests/results, reason codes, and audit events.
+- `openapi/` contains a small OpenAPI 3.1 validation endpoint fragment for
+  relying products that want an HTTP contract around local validation.
 
 ## Local Verification
 

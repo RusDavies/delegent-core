@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delegent.example/schemas/signed-authority-grant.schema.json",
+  "title": "Delegent Signed Authority Grant",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["claims", "signature", "signature_alg"],
+  "properties": {
+    "claims": { "$ref": "authority-grant-claims.schema.json" },
+    "signature": { "type": "string", "minLength": 1 },
+    "signature_alg": {
+      "type": "string",
+      "enum": ["hmac-sha256-test"]
+    }
+  }
+}
