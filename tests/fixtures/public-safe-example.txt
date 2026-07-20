@@ -1,0 +1,1 @@
+Delegent Core defines portable delegated-authority proof semantics.

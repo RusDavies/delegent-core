@@ -25,6 +25,7 @@ This repository starts private until explicit public-release approval.
 
 ```bash
 python -m unittest discover -s tests
+python scripts/check_public_boundary.py
 ```
 
 ## Minimal Example
@@ -108,3 +109,6 @@ Delegent Core owns safe bus/proof semantics and local validation. It must not
 contain private management strategy, customer-specific plans, downstream product
 coupling, pricing, hosted control-plane implementation, or enterprise-only
 governance workflows.
+
+See `SECURITY.md` and `docs/threat-model.md` for the current public-safe
+security posture and threat model.
