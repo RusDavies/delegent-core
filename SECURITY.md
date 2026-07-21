@@ -28,9 +28,14 @@ Out of scope:
 
 ## Reporting
 
-Until public release, report issues through the private project-management
-channel or private repository issue process configured for the project. Do not
-put secrets, raw customer data, private payloads, or live credentials in reports.
+Please report security vulnerabilities using GitHub's private vulnerability
+reporting flow for this repository. Do not open public issues for suspected
+vulnerabilities, and do not include secrets, raw customer data, private
+payloads, or live credentials in reports.
+
+Before the first public release, this repository remains private. Security
+issues are handled through the private project-management repository or private
+repository issue process configured for the project.
 
 ## Current Guarantees
 
