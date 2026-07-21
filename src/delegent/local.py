@@ -78,6 +78,14 @@ class StaticConformanceEvidenceProvider:
         return self._statuses.get(evidence_ref, "accepted")
 
 
+class StaticCredentialEvidenceProvider:
+    def __init__(self, statuses: dict[str, str] | None = None) -> None:
+        self._statuses = statuses or {}
+
+    def status(self, evidence_ref: str) -> str:
+        return self._statuses.get(evidence_ref, "active")
+
+
 class AuthorityGrantIssuer:
     def __init__(
         self,
@@ -113,6 +121,7 @@ class AuthorityGrantIssuer:
         revocation_status_ref: str,
         policy_decision_id: str | None = None,
         conformance_evidence_ref: str | None = None,
+        credential_evidence_ref: str | None = None,
         attestation_result_id: str | None = None,
         sensitivity: str | None = None,
         request_context_hash: str | None = None,
@@ -139,6 +148,7 @@ class AuthorityGrantIssuer:
             revocation_status_ref=revocation_status_ref,
             policy_decision_id=policy_decision_id,
             conformance_evidence_ref=conformance_evidence_ref,
+            credential_evidence_ref=credential_evidence_ref,
             attestation_result_id=attestation_result_id,
             sensitivity=sensitivity,
             request_context_hash=request_context_hash,
@@ -157,6 +167,7 @@ class AuthorityGrantIssuer:
                 sender_constraint_id=grant.sender_constraint_id,
                 policy_decision_id=grant.policy_decision_id,
                 conformance_evidence_ref=grant.conformance_evidence_ref,
+                credential_evidence_ref=grant.credential_evidence_ref,
             ).as_dict()
         )
         claims = grant.as_dict()
@@ -219,6 +230,8 @@ class AuthorityProofValidator:
         audit_log: InMemoryAuditLog,
         conformance_evidence: StaticConformanceEvidenceProvider | None = None,
         conformance_required_actions: frozenset[str] = frozenset(),
+        credential_evidence: StaticCredentialEvidenceProvider | None = None,
+        credential_required_actions: frozenset[str] = frozenset(),
     ) -> None:
         self.audience = audience
         self.grant_signing_secret = grant_signing_secret
@@ -228,6 +241,8 @@ class AuthorityProofValidator:
         self.audit_log = audit_log
         self.conformance_evidence = conformance_evidence
         self.conformance_required_actions = conformance_required_actions
+        self.credential_evidence = credential_evidence
+        self.credential_required_actions = credential_required_actions
 
     def validate(
         self, request: DelegentRequest, *, now: datetime | None = None
@@ -314,6 +329,11 @@ class AuthorityProofValidator:
         conformance_result = self._conformance_result(request, claims)
         if conformance_result:
             decision, reason_code = conformance_result
+            return self._result(decision, reason_code, request, claims, checked_at)
+
+        credential_result = self._credential_result(request, claims)
+        if credential_result:
+            decision, reason_code = credential_result
             return self._result(decision, reason_code, request, claims, checked_at)
 
         if not self._sender_proof_valid(request):
@@ -435,6 +455,71 @@ class AuthorityProofValidator:
             ReasonCode.DEPENDENCY_UNAVAILABLE,
         )
 
+    def _credential_result(
+        self, request: DelegentRequest, claims: dict[str, Any]
+    ) -> tuple[str, str] | None:
+        grant_ref = claims.get("credential_evidence_ref")
+        request_ref = request.credential_evidence_ref
+        required = request.requested_action in self.credential_required_actions
+
+        if required and (not grant_ref or not request_ref):
+            return (
+                ValidationDecision.DENY,
+                ReasonCode.CREDENTIAL_EVIDENCE_REQUIRED,
+            )
+        if request_ref and grant_ref and request_ref != grant_ref:
+            return (
+                ValidationDecision.DENY,
+                ReasonCode.CREDENTIAL_EVIDENCE_FAILED,
+            )
+        if request_ref and not grant_ref:
+            return (
+                ValidationDecision.DENY,
+                ReasonCode.CREDENTIAL_EVIDENCE_FAILED,
+            )
+        if not grant_ref:
+            return None
+        if request_ref is None:
+            request_ref = str(grant_ref)
+        if request_ref != grant_ref:
+            return (
+                ValidationDecision.DENY,
+                ReasonCode.CREDENTIAL_EVIDENCE_FAILED,
+            )
+        if self.credential_evidence is None:
+            if required:
+                return (
+                    ValidationDecision.ERROR_FAIL_CLOSED,
+                    ReasonCode.DEPENDENCY_UNAVAILABLE,
+                )
+            return None
+
+        status = self.credential_evidence.status(str(grant_ref))
+        if status in {"accepted", "active", "issued", "fresh"}:
+            return None
+        if status in {
+            "denied",
+            "failed",
+            "rejected",
+            "expired",
+            "revoked",
+            "rotated",
+            "not_authorized",
+        }:
+            return (
+                ValidationDecision.DENY,
+                ReasonCode.CREDENTIAL_EVIDENCE_FAILED,
+            )
+        if status in {"unknown", "unavailable"}:
+            return (
+                ValidationDecision.ERROR_FAIL_CLOSED,
+                ReasonCode.DEPENDENCY_UNAVAILABLE,
+            )
+        return (
+            ValidationDecision.ERROR_FAIL_CLOSED,
+            ReasonCode.DEPENDENCY_UNAVAILABLE,
+        )
+
     def _result(
         self,
         decision: str,
@@ -459,6 +544,7 @@ class AuthorityProofValidator:
             revocation_check_result=claims.get("revocation_status_ref"),
             policy_decision_id=claims.get("policy_decision_id"),
             conformance_evidence_ref=claims.get("conformance_evidence_ref"),
+            credential_evidence_ref=claims.get("credential_evidence_ref"),
             validation_result=decision,
             reason_code=reason_code,
         ).as_dict()

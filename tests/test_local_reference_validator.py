@@ -18,6 +18,7 @@ from delegent import (  # noqa: E402
     InMemoryReplayCache,
     ReasonCode,
     StaticConformanceEvidenceProvider,
+    StaticCredentialEvidenceProvider,
     StaticRevocationStatusProvider,
     ValidationDecision,
     make_sender_proof,
@@ -238,6 +239,94 @@ class LocalReferenceValidatorTests(unittest.TestCase):
         self.assertFalse(result.allowed)
         self.assertEqual(result.reason_code, ReasonCode.CONFORMANCE_EVIDENCE_FAILED)
 
+    def test_accepts_required_credential_evidence(self) -> None:
+        flow = Flow(
+            credential_evidence_ref="credential://principals/runtime-001/evidence/cert",
+            credential_required_actions=frozenset({"create_record"}),
+            credential_status={
+                "credential://principals/runtime-001/evidence/cert": "active"
+            },
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                credential_evidence_ref="credential://principals/runtime-001/evidence/cert"
+            ),
+            now=NOW,
+        )
+
+        self.assertTrue(result.allowed)
+        self.assertEqual(
+            result.audit_event["credential_evidence_ref"],
+            "credential://principals/runtime-001/evidence/cert",
+        )
+
+    def test_requires_credential_evidence_for_configured_actions(self) -> None:
+        flow = Flow(credential_required_actions=frozenset({"create_record"}))
+
+        result = flow.validator.validate(flow.request(), now=NOW)
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(
+            result.reason_code,
+            ReasonCode.CREDENTIAL_EVIDENCE_REQUIRED,
+        )
+
+    def test_rejects_failed_credential_evidence(self) -> None:
+        flow = Flow(
+            credential_evidence_ref="credential://principals/runtime-001/evidence/cert",
+            credential_required_actions=frozenset({"create_record"}),
+            credential_status={
+                "credential://principals/runtime-001/evidence/cert": "revoked"
+            },
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                credential_evidence_ref="credential://principals/runtime-001/evidence/cert"
+            ),
+            now=NOW,
+        )
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.reason_code, ReasonCode.CREDENTIAL_EVIDENCE_FAILED)
+
+    def test_fails_closed_when_credential_evidence_unavailable(self) -> None:
+        flow = Flow(
+            credential_evidence_ref="credential://principals/runtime-001/evidence/cert",
+            credential_required_actions=frozenset({"create_record"}),
+            credential_status={
+                "credential://principals/runtime-001/evidence/cert": "unavailable"
+            },
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                credential_evidence_ref="credential://principals/runtime-001/evidence/cert"
+            ),
+            now=NOW,
+        )
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.decision, ValidationDecision.ERROR_FAIL_CLOSED)
+        self.assertEqual(result.reason_code, ReasonCode.DEPENDENCY_UNAVAILABLE)
+
+    def test_rejects_mismatched_credential_evidence_reference(self) -> None:
+        flow = Flow(
+            credential_evidence_ref="credential://principals/runtime-001/evidence/cert",
+            credential_required_actions=frozenset({"create_record"}),
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                credential_evidence_ref="credential://principals/runtime-002/evidence/cert"
+            ),
+            now=NOW,
+        )
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.reason_code, ReasonCode.CREDENTIAL_EVIDENCE_FAILED)
+
 
 class Flow:
     def __init__(
@@ -249,6 +338,9 @@ class Flow:
         conformance_evidence_ref: str | None = None,
         conformance_required_actions: frozenset[str] = frozenset(),
         conformance_status: dict[str, str] | None = None,
+        credential_evidence_ref: str | None = None,
+        credential_required_actions: frozenset[str] = frozenset(),
+        credential_status: dict[str, str] | None = None,
         revocation_status: dict[str, str] | None = None,
         sender_secret: str = SENDER_SECRET,
     ) -> None:
@@ -286,6 +378,7 @@ class Flow:
             revocation_status_ref="grant-status-demo",
             policy_decision_id=policy_decision_id,
             conformance_evidence_ref=conformance_evidence_ref,
+            credential_evidence_ref=credential_evidence_ref,
             sensitivity="restricted",
         )
         self.validator = AuthorityProofValidator(
@@ -299,6 +392,8 @@ class Flow:
                 conformance_status
             ),
             conformance_required_actions=conformance_required_actions,
+            credential_evidence=StaticCredentialEvidenceProvider(credential_status),
+            credential_required_actions=credential_required_actions,
         )
 
     def request(
@@ -308,6 +403,7 @@ class Flow:
         session_id: str = "session-demo",
         requested_action: str = "create_record",
         conformance_evidence_ref: str | None = None,
+        credential_evidence_ref: str | None = None,
         raw_payload: str | None = None,
     ) -> DelegentRequest:
         method = "POST"
@@ -333,6 +429,7 @@ class Flow:
             sender_proof=sender_proof,
             payload_ref="private://session-demo/manifest.json",
             conformance_evidence_ref=conformance_evidence_ref,
+            credential_evidence_ref=credential_evidence_ref,
             raw_payload=raw_payload,
         )
 
