@@ -8,4 +8,5 @@ tests, fixtures, schemas, public-safe docs, and examples.
 
 Do not add private strategy, customer details, pricing, workspace-local paths,
 Discord metadata, management backlog, or commercial control-plane code here.
-Keep the repo private until explicit public-release approval.
+Do not change repository visibility, package publication, or release state
+without explicit approval through the private management repository.
