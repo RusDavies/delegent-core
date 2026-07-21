@@ -28,6 +28,12 @@ This repository starts private until explicit public-release approval.
 ## Local Verification
 
 ```bash
+python scripts/check.py
+```
+
+The gate currently runs:
+
+```bash
 python -m unittest discover -s tests
 python scripts/check_public_boundary.py
 ```
