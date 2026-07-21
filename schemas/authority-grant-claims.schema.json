@@ -48,6 +48,7 @@
     "replay_handle": { "type": "string", "minLength": 1 },
     "revocation_status_ref": { "type": "string", "minLength": 1 },
     "policy_decision_id": { "type": ["string", "null"], "minLength": 1 },
+    "conformance_evidence_ref": { "type": ["string", "null"], "minLength": 1 },
     "attestation_result_id": { "type": ["string", "null"], "minLength": 1 },
     "sensitivity": { "type": ["string", "null"], "minLength": 1 },
     "request_context_hash": { "type": ["string", "null"], "minLength": 1 }

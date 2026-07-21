@@ -43,6 +43,8 @@ class ReasonCode:
     REPLAY_DETECTED = "replay_detected"
     POLICY_DENIED = "policy_denied"
     POLICY_REVIEW_REQUIRED = "policy_review_required"
+    CONFORMANCE_EVIDENCE_REQUIRED = "conformance_evidence_required"
+    CONFORMANCE_EVIDENCE_FAILED = "conformance_evidence_failed"
     ATTESTATION_REQUIRED = "attestation_required"
     DEPENDENCY_UNAVAILABLE = "dependency_unavailable"
     RAW_PAYLOAD_NOT_ALLOWED = "raw_payload_not_allowed"
@@ -101,6 +103,7 @@ class AuthorityGrantClaims:
     revocation_status_ref: str
     not_before: datetime | None = None
     policy_decision_id: str | None = None
+    conformance_evidence_ref: str | None = None
     attestation_result_id: str | None = None
     sensitivity: str | None = None
     request_context_hash: str | None = None
@@ -126,6 +129,7 @@ class AuthorityGrantClaims:
             "replay_handle": self.replay_handle,
             "revocation_status_ref": self.revocation_status_ref,
             "policy_decision_id": self.policy_decision_id,
+            "conformance_evidence_ref": self.conformance_evidence_ref,
             "attestation_result_id": self.attestation_result_id,
             "sensitivity": self.sensitivity,
             "request_context_hash": self.request_context_hash,
@@ -177,6 +181,7 @@ class DelegentRequest:
     grant: dict[str, Any]
     sender_proof: SenderProof
     payload_ref: str | None = None
+    conformance_evidence_ref: str | None = None
     raw_payload: str | None = None
 
 
@@ -204,6 +209,7 @@ class AuthorityGrantIssuedAuditEvent:
     allowed_actions: tuple[str, ...]
     sender_constraint_id: str
     policy_decision_id: str | None
+    conformance_evidence_ref: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -219,6 +225,7 @@ class AuthorityGrantIssuedAuditEvent:
             "allowed_actions": list(self.allowed_actions),
             "sender_constraint_id": self.sender_constraint_id,
             "policy_decision_id": self.policy_decision_id,
+            "conformance_evidence_ref": self.conformance_evidence_ref,
             "result": "issued",
             "reason_code": ReasonCode.ALLOWED,
         }
@@ -243,6 +250,7 @@ class AuthorityGrantValidatedAuditEvent:
     sender_constraint_method: str = SENDER_CONSTRAINT_METHOD_TEST
     revocation_check_result: str | None = None
     policy_decision_id: str | None = None
+    conformance_evidence_ref: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -262,6 +270,7 @@ class AuthorityGrantValidatedAuditEvent:
             "sender_constraint_method": self.sender_constraint_method,
             "revocation_check_result": self.revocation_check_result,
             "policy_decision_id": self.policy_decision_id,
+            "conformance_evidence_ref": self.conformance_evidence_ref,
             "validation_result": self.validation_result,
             "reason_code": self.reason_code,
         }
