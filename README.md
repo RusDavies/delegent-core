@@ -50,6 +50,18 @@ python -m unittest discover -s tests
 python scripts/check_public_boundary.py
 ```
 
+## Local Release Candidate
+
+Build and verify a locally installable release candidate with:
+
+```bash
+python scripts/check_release_candidate.py
+```
+
+The release-candidate gate builds the package, installs the wheel into a fresh
+virtual environment, runs the conformance tests, and executes the standalone
+examples without `PYTHONPATH` or commercial services.
+
 ## Minimal Example
 
 ```python
