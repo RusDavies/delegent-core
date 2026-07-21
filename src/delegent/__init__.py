@@ -20,6 +20,7 @@ from .local import (
     AuthorityProofValidator,
     InMemoryAuditLog,
     InMemoryReplayCache,
+    StaticConformanceEvidenceProvider,
     StaticRevocationStatusProvider,
     make_sender_proof,
 )
@@ -36,6 +37,7 @@ __all__ = [
     "DelegentRequest",
     "InMemoryAuditLog",
     "InMemoryReplayCache",
+    "StaticConformanceEvidenceProvider",
     "ReasonCode",
     "SenderProof",
     "SignedAuthorityGrant",

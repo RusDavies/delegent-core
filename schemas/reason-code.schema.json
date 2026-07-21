@@ -21,6 +21,8 @@
     "replay_detected",
     "policy_denied",
     "policy_review_required",
+    "conformance_evidence_required",
+    "conformance_evidence_failed",
     "attestation_required",
     "dependency_unavailable",
     "raw_payload_not_allowed",

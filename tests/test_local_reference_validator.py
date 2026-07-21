@@ -17,6 +17,7 @@ from delegent import (  # noqa: E402
     InMemoryAuditLog,
     InMemoryReplayCache,
     ReasonCode,
+    StaticConformanceEvidenceProvider,
     StaticRevocationStatusProvider,
     ValidationDecision,
     make_sender_proof,
@@ -151,6 +152,92 @@ class LocalReferenceValidatorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "policy_decision_id"):
             Flow(allowed_actions=("change_sensitivity",), policy_decision_id=None)
 
+    def test_accepts_required_conformance_evidence(self) -> None:
+        flow = Flow(
+            conformance_evidence_ref="conformance://runs/run-001/conformance/pass",
+            conformance_required_actions=frozenset({"create_record"}),
+            conformance_status={
+                "conformance://runs/run-001/conformance/pass": "accepted"
+            },
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                conformance_evidence_ref="conformance://runs/run-001/conformance/pass"
+            ),
+            now=NOW,
+        )
+
+        self.assertTrue(result.allowed)
+        self.assertEqual(
+            result.audit_event["conformance_evidence_ref"],
+            "conformance://runs/run-001/conformance/pass",
+        )
+
+    def test_requires_conformance_evidence_for_configured_actions(self) -> None:
+        flow = Flow(conformance_required_actions=frozenset({"create_record"}))
+
+        result = flow.validator.validate(flow.request(), now=NOW)
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(
+            result.reason_code,
+            ReasonCode.CONFORMANCE_EVIDENCE_REQUIRED,
+        )
+
+    def test_rejects_failed_conformance_evidence(self) -> None:
+        flow = Flow(
+            conformance_evidence_ref="conformance://runs/run-001/conformance/fail",
+            conformance_required_actions=frozenset({"create_record"}),
+            conformance_status={"conformance://runs/run-001/conformance/fail": "denied"},
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                conformance_evidence_ref="conformance://runs/run-001/conformance/fail"
+            ),
+            now=NOW,
+        )
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.reason_code, ReasonCode.CONFORMANCE_EVIDENCE_FAILED)
+
+    def test_fails_closed_when_conformance_evidence_unavailable(self) -> None:
+        flow = Flow(
+            conformance_evidence_ref="conformance://runs/run-001/conformance/pending",
+            conformance_required_actions=frozenset({"create_record"}),
+            conformance_status={
+                "conformance://runs/run-001/conformance/pending": "unavailable"
+            },
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                conformance_evidence_ref="conformance://runs/run-001/conformance/pending"
+            ),
+            now=NOW,
+        )
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.decision, ValidationDecision.ERROR_FAIL_CLOSED)
+        self.assertEqual(result.reason_code, ReasonCode.DEPENDENCY_UNAVAILABLE)
+
+    def test_rejects_mismatched_conformance_evidence_reference(self) -> None:
+        flow = Flow(
+            conformance_evidence_ref="conformance://runs/run-001/conformance/pass",
+            conformance_required_actions=frozenset({"create_record"}),
+        )
+
+        result = flow.validator.validate(
+            flow.request(
+                conformance_evidence_ref="conformance://runs/run-002/conformance/pass"
+            ),
+            now=NOW,
+        )
+
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.reason_code, ReasonCode.CONFORMANCE_EVIDENCE_FAILED)
+
 
 class Flow:
     def __init__(
@@ -159,6 +246,9 @@ class Flow:
         audience: str = "example-relying-product",
         allowed_actions: tuple[str, ...] = ("create_record",),
         policy_decision_id: str | None = "policy-decision-demo",
+        conformance_evidence_ref: str | None = None,
+        conformance_required_actions: frozenset[str] = frozenset(),
+        conformance_status: dict[str, str] | None = None,
         revocation_status: dict[str, str] | None = None,
         sender_secret: str = SENDER_SECRET,
     ) -> None:
@@ -195,6 +285,7 @@ class Flow:
             replay_handle="replay-demo",
             revocation_status_ref="grant-status-demo",
             policy_decision_id=policy_decision_id,
+            conformance_evidence_ref=conformance_evidence_ref,
             sensitivity="restricted",
         )
         self.validator = AuthorityProofValidator(
@@ -204,6 +295,10 @@ class Flow:
             revocation_status=StaticRevocationStatusProvider(revocation_status),
             replay_cache=InMemoryReplayCache(),
             audit_log=self.audit,
+            conformance_evidence=StaticConformanceEvidenceProvider(
+                conformance_status
+            ),
+            conformance_required_actions=conformance_required_actions,
         )
 
     def request(
@@ -212,6 +307,7 @@ class Flow:
         project_id: str = "project-demo",
         session_id: str = "session-demo",
         requested_action: str = "create_record",
+        conformance_evidence_ref: str | None = None,
         raw_payload: str | None = None,
     ) -> DelegentRequest:
         method = "POST"
@@ -236,6 +332,7 @@ class Flow:
             grant=self.grant,
             sender_proof=sender_proof,
             payload_ref="private://session-demo/manifest.json",
+            conformance_evidence_ref=conformance_evidence_ref,
             raw_payload=raw_payload,
         )
 

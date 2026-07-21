@@ -26,6 +26,7 @@
     "grant": { "$ref": "signed-authority-grant.schema.json" },
     "sender_proof": { "$ref": "sender-proof.schema.json" },
     "payload_ref": { "type": ["string", "null"], "minLength": 1 },
+    "conformance_evidence_ref": { "type": ["string", "null"], "minLength": 1 },
     "raw_payload": {
       "type": ["string", "null"],
       "description": "Reference validators should reject non-null raw payloads."

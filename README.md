@@ -21,7 +21,8 @@ release decision.
   for demos, conformance tests, and relying-product adapter development:
   `AuthorityGrantIssuer`, `AuthorityProofValidator`,
   `CapabilityActionProfile`, `InMemoryReplayCache`,
-  `StaticRevocationStatusProvider`, and `make_sender_proof`.
+  `StaticRevocationStatusProvider`, `StaticConformanceEvidenceProvider`, and
+  `make_sender_proof`.
 - `schemas/` contains JSON Schema fragments for grants, sender proofs,
   validation requests/results, reason codes, and audit events.
 - `openapi/` contains a small OpenAPI 3.1 validation endpoint fragment for
@@ -36,6 +37,14 @@ revocation provider are for tests, examples, conformance fixtures, and relying
 product adapter development only. They are not production cryptography, key
 management, replay infrastructure, revocation infrastructure, or authorization
 operations.
+
+## Conformance Evidence
+
+Grants and validation requests may carry `conformance_evidence_ref`, a generic
+reference to runtime or workflow conformance evidence. The local validator can
+be configured to require evidence for selected actions, accept known-good
+evidence, deny failed evidence, or fail closed when the evidence source is
+unavailable.
 
 ## Local Verification
 
