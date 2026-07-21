@@ -27,6 +27,14 @@ This repository starts private until explicit public-release approval.
 - `examples/` contains standalone relying-product examples that validate
   Delegent grants locally without any commercial service.
 
+## Cryptography Warning
+
+The local HMAC issuer, sender-proof helper, in-memory replay cache, and static
+revocation provider are for tests, examples, conformance fixtures, and relying
+product adapter development only. They are not production cryptography, key
+management, replay infrastructure, revocation infrastructure, or authorization
+operations.
+
 ## Local Verification
 
 ```bash
