@@ -37,6 +37,15 @@ Before the first public release, this repository remains private. Security
 issues are handled through the private project-management repository or private
 repository issue process configured for the project.
 
+## Supported Versions
+
+Delegent Core has no public supported versions before its first public release.
+
+The current `0.1.0` package metadata is pre-alpha and private; it exists for
+contract development, local examples, and verification work. A public supported
+version policy must be reviewed and updated before any public release or package
+publication.
+
 ## Current Guarantees
 
 The current implementation is a reference implementation for contracts, demos,
