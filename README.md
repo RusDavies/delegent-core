@@ -24,6 +24,8 @@ This repository starts private until explicit public-release approval.
   validation requests/results, reason codes, and audit events.
 - `openapi/` contains a small OpenAPI 3.1 validation endpoint fragment for
   relying products that want an HTTP contract around local validation.
+- `examples/` contains standalone relying-product examples that validate
+  Delegent grants locally without any commercial service.
 
 ## Local Verification
 
@@ -111,6 +113,13 @@ validator = AuthorityProofValidator(
 )
 
 assert validator.validate(request, now=now).allowed
+```
+
+More complete examples live under `examples/`:
+
+```bash
+PYTHONPATH=src python examples/document_review_gate.py
+PYTHONPATH=src python examples/maintenance_window_gate.py
 ```
 
 ## Boundary
