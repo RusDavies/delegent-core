@@ -122,3 +122,7 @@ governance workflows.
 
 See `SECURITY.md` and `docs/threat-model.md` for the current public-safe
 security posture and threat model.
+
+## License
+
+Delegent Core is licensed under the Apache License 2.0.
