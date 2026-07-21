@@ -7,7 +7,9 @@ for AI agents. It should have standalone value: protocol shapes, validator
 behavior, conformance fixtures, reason codes, audit schemas, and examples that
 an unrelated relying product can use without the commercial control plane.
 
-This repository starts private until explicit public-release approval.
+This repository is public pre-alpha open-core work. Package publication,
+supported-version commitments, and production-use claims require a separate
+release decision.
 
 ## Package Surface
 

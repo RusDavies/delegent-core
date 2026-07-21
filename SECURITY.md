@@ -1,6 +1,6 @@
 # Security Policy
 
-Delegent Core is pre-alpha and not yet approved for public release.
+Delegent Core is public pre-alpha open-core work.
 
 ## Scope
 
@@ -33,18 +33,19 @@ reporting flow for this repository. Do not open public issues for suspected
 vulnerabilities, and do not include secrets, raw customer data, private
 payloads, or live credentials in reports.
 
-Before the first public release, this repository remains private. Security
-issues are handled through the private project-management repository or private
-repository issue process configured for the project.
+This repository is public, but it has not had a package-publication or
+supported-version release. Security issues may also be coordinated through the
+private project-management repository when they involve non-public planning,
+commercial implementation, or sensitive operational context.
 
 ## Supported Versions
 
-Delegent Core has no public supported versions before its first public release.
+Delegent Core has no supported public package versions before its first package
+publication release.
 
-The current `0.1.0` package metadata is pre-alpha and private; it exists for
-contract development, local examples, and verification work. A public supported
-version policy must be reviewed and updated before any public release or package
-publication.
+The current `0.1.0` package metadata is pre-alpha and exists for contract
+development, local examples, and verification work. A public supported-version
+policy must be reviewed and updated before package publication.
 
 ## Current Guarantees
 
