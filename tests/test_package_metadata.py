@@ -12,11 +12,9 @@ class PackageMetadataTests(unittest.TestCase):
         data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
         project = data["project"]
 
-        self.assertEqual(project["license"]["file"], "LICENSE")
-        self.assertIn(
-            "License :: OSI Approved :: Apache Software License",
-            project["classifiers"],
-        )
+        self.assertEqual(project["license"], "Apache-2.0")
+        self.assertEqual(project["license-files"], ["LICENSE"])
+        self.assertNotIn("License ::", "\n".join(project["classifiers"]))
 
     def test_license_file_is_apache_2(self) -> None:
         license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
