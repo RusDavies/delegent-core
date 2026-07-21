@@ -21,8 +21,8 @@ release decision.
   for demos, conformance tests, and relying-product adapter development:
   `AuthorityGrantIssuer`, `AuthorityProofValidator`,
   `CapabilityActionProfile`, `InMemoryReplayCache`,
-  `StaticRevocationStatusProvider`, `StaticConformanceEvidenceProvider`, and
-  `make_sender_proof`.
+  `StaticRevocationStatusProvider`, `StaticConformanceEvidenceProvider`,
+  `StaticCredentialEvidenceProvider`, and `make_sender_proof`.
 - `schemas/` contains JSON Schema fragments for grants, sender proofs,
   validation requests/results, reason codes, and audit events.
 - `openapi/` contains a small OpenAPI 3.1 validation endpoint fragment for
@@ -45,6 +45,16 @@ reference to runtime or workflow conformance evidence. The local validator can
 be configured to require evidence for selected actions, accept known-good
 evidence, deny failed evidence, or fail closed when the evidence source is
 unavailable.
+
+## Credential Evidence
+
+Grants and validation requests may carry `credential_evidence_ref`, a generic
+reference to workload, sender-constraint, or managed-node credential evidence.
+The local validator can require credential evidence for selected actions,
+accept active evidence, deny revoked or expired evidence, and fail closed when
+the credential evidence source is unavailable. Delegent Core keeps this generic:
+SSH key and certificate lifecycle belongs to downstream integrations, not the
+portable proof contract.
 
 ## Local Verification
 

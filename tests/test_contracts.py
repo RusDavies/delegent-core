@@ -58,10 +58,14 @@ class ContractTests(unittest.TestCase):
             replay_handle="replay-demo",
             revocation_status_ref="grant-status-demo",
             policy_decision_id="policy-decision-demo",
+            conformance_evidence_ref="conformance-demo",
+            credential_evidence_ref="credential-demo",
         ).as_dict()
 
         self.assertEqual(claims["grant_profile"], GRANT_PROFILE)
         self.assertEqual(claims["allowed_actions"], ["create_record"])
+        self.assertEqual(claims["conformance_evidence_ref"], "conformance-demo")
+        self.assertEqual(claims["credential_evidence_ref"], "credential-demo")
         self.assertIn('"allowed_actions":["create_record"]', canonical_json(claims))
 
     def test_signed_grant_contract_shape(self) -> None:

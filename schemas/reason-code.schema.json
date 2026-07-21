@@ -23,6 +23,8 @@
     "policy_review_required",
     "conformance_evidence_required",
     "conformance_evidence_failed",
+    "credential_evidence_required",
+    "credential_evidence_failed",
     "attestation_required",
     "dependency_unavailable",
     "raw_payload_not_allowed",
